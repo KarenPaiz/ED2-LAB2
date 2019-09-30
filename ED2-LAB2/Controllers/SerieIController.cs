@@ -39,8 +39,7 @@ namespace ED2_LAB2.Controllers
             var Clave = clave.ToCharArray();
             var ContadorAbecedario = 65; //Empieza en 'A' (65) y termina en 'z' (122) sin el rango [91-96]
 
-            var extension = Path.GetExtension(ArchivoImportado.FileName);
-            var NombreArchivo =  extension.Split('.')[0];
+            var NombreArchivo = Path.GetFileNameWithoutExtension(ArchivoImportado.FileName);
 
             foreach (var item in Clave)
             {
@@ -72,7 +71,23 @@ namespace ED2_LAB2.Controllers
                 {
                     using (var writer = new BinaryWriter(writeStream))
                     {
-
+                        var byteBuffer = new byte[bufferLength];
+                        while (Lectura.BaseStream.Position != Lectura.BaseStream.Length)
+                        {
+                            byteBuffer = Lectura.ReadBytes(bufferLength);
+                            foreach (var item in byteBuffer)
+                            {
+                                if (DiccionarioCifrado.ContainsKey(Convert.ToChar(item)))
+                                {
+                                    var ByteEscrito = DiccionarioCifrado.ElementAt(Convert.ToChar(item));
+                                    writer.Write(ByteEscrito);
+                                }
+                                else
+                                {
+                                    writer.Write(item);
+                                }
+                            }
+                        }
                     }
                 }
             }
