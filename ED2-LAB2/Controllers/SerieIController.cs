@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.IO;
 using System.Web.Mvc;
 
 namespace ED2_LAB2.Controllers
 {
     public class SerieIController : Controller
     {
+        const int bufferLength = 100;
+
         // GET: SerieI
         public ActionResult Menu()
         {
@@ -34,7 +37,11 @@ namespace ED2_LAB2.Controllers
         {
             var DiccionarioCifrado = new Dictionary<char, char>();
             var Clave = clave.ToCharArray();
-            var ContadorAbecedario = 65; //Empieza en 'A' (65) y termina en 'z' (122)
+            var ContadorAbecedario = 65; //Empieza en 'A' (65) y termina en 'z' (122) sin el rango [91-96]
+
+            var extension = Path.GetExtension(ArchivoImportado.FileName);
+            var NombreArchivo =  extension.Split('.')[0];
+
             foreach (var item in Clave)
             {
                 if ( !(ContadorAbecedario >= 91 && ContadorAbecedario <= 96)) {
@@ -57,6 +64,16 @@ namespace ED2_LAB2.Controllers
                 else {
                     i--;
                     ContadorAbecedario++;
+                }
+            }
+            using (var Lectura = new BinaryReader(ArchivoImportado.InputStream))
+            {
+                using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ".cif"), FileMode.OpenOrCreate))
+                {
+                    using (var writer = new BinaryWriter(writeStream))
+                    {
+
+                    }
                 }
             }
             return View();
