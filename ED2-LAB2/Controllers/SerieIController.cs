@@ -9,26 +9,19 @@ namespace ED2_LAB2.Controllers
     public class SerieIController : Controller
     {
         // GET: SerieI
-        public ActionResult Index()
+        public ActionResult Menu()
         {
             return View();
         }
-
-        public ActionResult CifradoZigZag()
+        public ActionResult MenuEspiral()
         {
             return View();
         }
-        [HttpPost]
-        public ActionResult CifradoZigZag(HttpPostedFileBase ArchivoImportado)
+        public ActionResult MenuCesar()
         {
             return View();
         }
-        public ActionResult CifradoEspiaral()
-        {
-            return View();
-        }
-        [HttpPost]
-        public ActionResult CifradoEspiral(HttpPostedFileBase ArchivoImportado)
+        public ActionResult MenuZigZag()
         {
             return View();
         }
@@ -37,10 +30,32 @@ namespace ED2_LAB2.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult CifradoCesar(HttpPostedFileBase ArchivoImportado)
+        public ActionResult CifradoCesar(HttpPostedFileBase ArchivoImportado, string clave)
+        {
+            var DiccionarioCifrado = new Dictionary<char, char>();
+            
+            return View();
+        }
+
+        public ActionResult CifradoZigZag()
         {
             return View();
         }
+        [HttpPost]
+        public ActionResult CifradoZigZag(HttpPostedFileBase ArchivoImportado, int nivel)
+        {
+            return View();
+        }
+        public ActionResult CifradoEspiral()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult CifradoEspiral(HttpPostedFileBase ArchivoImportado, int Filas, int Columnas)
+        {
+            return View();
+        }
+        
 
     }
 }
