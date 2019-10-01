@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using System.Web.Mvc;
+using ED2_LAB2.Models;
+
 
 namespace ED2_LAB2.Controllers
 {
@@ -16,82 +18,76 @@ namespace ED2_LAB2.Controllers
         {
             return View();
         }
-        public ActionResult MenuEspiral()
-        {
-            return View();
-        }
-        public ActionResult MenuCesar()
-        {
-            return View();
-        }
-        public ActionResult MenuZigZag()
-        {
-            return View();
-        }
         public ActionResult CifradoCesar()
         {
             return View();
         }
         [HttpPost]
-        public ActionResult CifradoCesar(HttpPostedFileBase ArchivoImportado, string clave)
+        public ActionResult CifradoCesar(HttpPostedFileBase ArchivoImportado, string clave, string Opcion)
         {
-            var DiccionarioCifrado = new Dictionary<char, char>();
-            var Clave = clave.ToCharArray();
-            var ContadorAbecedario = 65; //Empieza en 'A' (65) y termina en 'z' (122) sin el rango [91-96]
-
+            var OpcionDeCifrado = true;
+            if (Opcion == "Descifrar"){
+                OpcionDeCifrado = false;
+            }
+            var ExtensionNuevoArchivo = string.Empty;
             var NombreArchivo = Path.GetFileNameWithoutExtension(ArchivoImportado.FileName);
-
-            foreach (var item in Clave)
+            var ExtensionArchivo = Path.GetExtension(ArchivoImportado.FileName);
+            if (ArchivoImportado != null)
             {
-                if ( !(ContadorAbecedario >= 91 && ContadorAbecedario <= 96)) {
-                    if (!DiccionarioCifrado.ContainsValue(item)){
-                        DiccionarioCifrado.Add(Convert.ToChar(ContadorAbecedario), item);
-                        ContadorAbecedario++;
-                    }
-                }
-            }
-            for (int i = 65; i < 123; i++)
-            {
-                if (!(ContadorAbecedario >= 91 && ContadorAbecedario <= 96))
+                
+                var DiccionarioCifrado = new Dictionary<char, char>();
+                var Cesar = new SerieIModel();
+                DiccionarioCifrado = Cesar.DiccionarioCesar(clave,OpcionDeCifrado);
+               
+                if (!OpcionDeCifrado && ExtensionArchivo == ".cif")
                 {
-                    if (!DiccionarioCifrado.ContainsValue(Convert.ToChar(i)) && !(i >= 91 && i <= 96))
-                    {
-                        DiccionarioCifrado.Add(Convert.ToChar(ContadorAbecedario), Convert.ToChar(i));
-                        ContadorAbecedario++;
-                    }
+                    ExtensionNuevoArchivo = ".txt";
                 }
-                else {
-                    i--;
-                    ContadorAbecedario++;
-                }
-            }
-            using (var Lectura = new BinaryReader(ArchivoImportado.InputStream))
-            {
-                using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ".cif"), FileMode.OpenOrCreate))
+                if (OpcionDeCifrado && ExtensionArchivo == ".txt")
                 {
-                    using (var writer = new BinaryWriter(writeStream))
+                    ExtensionNuevoArchivo = ".cif";
+                }
+                if(ExtensionNuevoArchivo!=null)
+                {
+                    using (var Lectura = new BinaryReader(ArchivoImportado.InputStream))
                     {
-                        var byteBuffer = new byte[bufferLength];
-                        while (Lectura.BaseStream.Position != Lectura.BaseStream.Length)
+                        using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo), FileMode.OpenOrCreate))
                         {
-                            byteBuffer = Lectura.ReadBytes(bufferLength);
-                            foreach (var item in byteBuffer)
+                            using (var writer = new BinaryWriter(writeStream))
                             {
-                                if (DiccionarioCifrado.ContainsKey(Convert.ToChar(item)))
+                                var byteBuffer = new byte[bufferLength];
+                                while (Lectura.BaseStream.Position != Lectura.BaseStream.Length)
                                 {
-                                    var ByteEscrito = DiccionarioCifrado[Convert.ToChar(item)];
-                                    writer.Write(ByteEscrito);
-                                }
-                                else
-                                {
-                                    writer.Write(item);
+                                    byteBuffer = Lectura.ReadBytes(bufferLength);
+                                    foreach (var item in byteBuffer)
+                                    {
+                                        if (DiccionarioCifrado.ContainsKey(Convert.ToChar(item)))
+                                        {
+                                            var ByteEscrito = DiccionarioCifrado[Convert.ToChar(item)];
+                                            writer.Write(ByteEscrito);
+                                        }
+                                        else
+                                        {
+                                            writer.Write(item);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                else
+                {
+                    //Danger("El archivo tiene un formato erroneo.", true);
+                }
+
             }
-            return View();
+            else
+            {
+                //Danger("El archivo es nulo.", true);
+            }
+            var FileVirtualPath = @"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo;
+            return File(FileVirtualPath, "application / force - download", Path.GetFileName(FileVirtualPath));
         }
 
         public ActionResult CifradoZigZag()

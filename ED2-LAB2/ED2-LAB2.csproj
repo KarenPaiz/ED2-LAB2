@@ -152,7 +152,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\SerieI.cs" />
+    <Compile Include="Models\SerieIModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -198,9 +198,6 @@
     <Content Include="Views\SerieI\CifradoZigZag.cshtml" />
     <Content Include="Views\SerieI\CifradoEspiral.cshtml" />
     <Content Include="Views\SerieI\Menu.cshtml" />
-    <Content Include="Views\SerieI\MenuEspiral.cshtml" />
-    <Content Include="Views\SerieI\MenuCesar.cshtml" />
-    <Content Include="Views\SerieI\MenuZigZag.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
