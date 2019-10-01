@@ -7,7 +7,7 @@ namespace ED2_LAB2.Models
 {
     public class SerieIModel
     {
-        public Dictionary<char,char> DiccionarioCesar(string clave, bool Opcion)
+        public Dictionary<char, char> DiccionarioCesar(string clave, bool Opcion)
         {
             var DiccionarioCifrado = new Dictionary<char, char>();
             var Clave = clave.ToCharArray();
@@ -45,5 +45,50 @@ namespace ED2_LAB2.Models
             }
             return DiccionarioCifrado;
         }
+        public string EncryptionZZ(string TextoOriginal, int CantidadNiveles)
+        {
+            var MatrizCifrado = new char[CantidadNiveles, TextoOriginal.Length];
+            for (int i = 0; i < CantidadNiveles; i++)
+            {
+                for (int j = 0; j < TextoOriginal.Length; j++)
+                {
+                    MatrizCifrado[i, j] = '~';
+                }
+            }
+            var RecoridoBaja = false; var Fila = 0; var Columna = 0;
+            for (int i = 0; i < TextoOriginal.Length; i++)
+            {
+                if (Fila==0||Fila==CantidadNiveles-1)
+                {
+                    RecoridoBaja = !RecoridoBaja;
+                }
+                MatrizCifrado[Fila,Columna++] = TextoOriginal[i];
+                if (RecoridoBaja)
+                {
+                    Fila++;
+                }
+                else
+                {
+                    Fila--;
+                }
+            }
+            var TextoEncriptado = string.Empty;
+            for (int i = 0; i < CantidadNiveles; i++)
+            {
+                for (int j = 0; j < TextoOriginal.Length; j++)
+                {
+                    if (MatrizCifrado[i, j]!='~')
+                    {
+                        TextoEncriptado += MatrizCifrado[i, j];
+                    }
+                }
+            }
+            return TextoEncriptado;
+        }
+        public string DecryptZZ(string TextoEncriptado, int CantidadNiveles)
+        {
+            return null;
+        }
+
     }
 }

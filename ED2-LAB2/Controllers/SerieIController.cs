@@ -26,7 +26,8 @@ namespace ED2_LAB2.Controllers
         public ActionResult CifradoCesar(HttpPostedFileBase ArchivoImportado, string clave, string Opcion)
         {
             var OpcionDeCifrado = true;
-            if (Opcion == "Descifrar"){
+            if (Opcion == "Descifrar")
+            {
                 OpcionDeCifrado = false;
             }
             var ExtensionNuevoArchivo = string.Empty;
@@ -34,11 +35,11 @@ namespace ED2_LAB2.Controllers
             var ExtensionArchivo = Path.GetExtension(ArchivoImportado.FileName);
             if (ArchivoImportado != null)
             {
-                
+
                 var DiccionarioCifrado = new Dictionary<char, char>();
                 var Cesar = new SerieIModel();
-                DiccionarioCifrado = Cesar.DiccionarioCesar(clave,OpcionDeCifrado);
-               
+                DiccionarioCifrado = Cesar.DiccionarioCesar(clave, OpcionDeCifrado);
+
                 if (!OpcionDeCifrado && ExtensionArchivo == ".cif")
                 {
                     ExtensionNuevoArchivo = ".txt";
@@ -47,7 +48,7 @@ namespace ED2_LAB2.Controllers
                 {
                     ExtensionNuevoArchivo = ".cif";
                 }
-                if(ExtensionNuevoArchivo!=null)
+                if (ExtensionNuevoArchivo != null)
                 {
                     using (var Lectura = new BinaryReader(ArchivoImportado.InputStream))
                     {
@@ -95,9 +96,38 @@ namespace ED2_LAB2.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult CifradoZigZag(HttpPostedFileBase ArchivoImportado, int nivel)
+        public ActionResult CifradoZigZag(HttpPostedFileBase ArchivoImportado, int nivel, string Opcion)
         {
-            return View();
+            var ExtensionNuevoArchivo = string.Empty;
+            var NombreArchivo = Path.GetFileNameWithoutExtension(ArchivoImportado.FileName);
+            var ExtensionArchivo = Path.GetExtension(ArchivoImportado.FileName);
+            if (ArchivoImportado != null)
+            {
+                using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo), FileMode.OpenOrCreate))
+                {
+                    using (var writer = new StreamWriter(writeStream))
+                    {
+                        using (var Lectura = new StreamReader(ArchivoImportado.InputStream))
+                        {
+                            var TextoArchivo = Lectura.ReadToEnd();
+                            if (Opcion=="Descifrar" && ExtensionArchivo == ".cif")
+                            {
+                                ExtensionNuevoArchivo = ".txt";
+                                var TextoDescifrado = new SerieIModel().DecryptZZ(TextoArchivo, nivel);
+                                writer.Write(TextoDescifrado);
+                            }
+                            if (Opcion == "Cifrar" && ExtensionArchivo == ".txt")
+                            {
+                                ExtensionNuevoArchivo = ".cif";
+                                var TextoCifrado = new SerieIModel().EncryptionZZ(TextoArchivo, nivel);
+                                writer.Write(TextoCifrado);
+                            }
+                        }
+                    }                    
+                }
+            }
+            var FileVirtualPath = @"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo;
+            return File(FileVirtualPath, "application / force - download", Path.GetFileName(FileVirtualPath));
         }
         public ActionResult CifradoEspiral()
         {
@@ -108,7 +138,7 @@ namespace ED2_LAB2.Controllers
         {
             return View();
         }
-        
+
 
     }
 }
