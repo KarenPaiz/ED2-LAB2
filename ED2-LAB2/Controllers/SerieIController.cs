@@ -79,7 +79,7 @@ namespace ED2_LAB2.Controllers
                             {
                                 if (DiccionarioCifrado.ContainsKey(Convert.ToChar(item)))
                                 {
-                                    var ByteEscrito = DiccionarioCifrado.ElementAt(Convert.ToChar(item));
+                                    var ByteEscrito = DiccionarioCifrado[Convert.ToChar(item)];
                                     writer.Write(ByteEscrito);
                                 }
                                 else
