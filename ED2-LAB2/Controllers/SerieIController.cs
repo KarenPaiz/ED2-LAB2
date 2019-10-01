@@ -25,6 +25,7 @@ namespace ED2_LAB2.Controllers
         [HttpPost]
         public ActionResult CifradoCesar(HttpPostedFileBase ArchivoImportado, string clave, string Opcion)
         {
+            Directory.CreateDirectory(Server.MapPath(@"~/App_Data/"));
             var OpcionDeCifrado = true;
             if (Opcion == "Descifrar")
             {
@@ -98,33 +99,41 @@ namespace ED2_LAB2.Controllers
         [HttpPost]
         public ActionResult CifradoZigZag(HttpPostedFileBase ArchivoImportado, int nivel, string Opcion)
         {
+            Directory.CreateDirectory(Server.MapPath(@"~/App_Data/"));
             var ExtensionNuevoArchivo = string.Empty;
             var NombreArchivo = Path.GetFileNameWithoutExtension(ArchivoImportado.FileName);
             var ExtensionArchivo = Path.GetExtension(ArchivoImportado.FileName);
             if (ArchivoImportado != null)
             {
-                using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo), FileMode.OpenOrCreate))
+                using (var Lectura = new StreamReader(ArchivoImportado.InputStream))
                 {
-                    using (var writer = new StreamWriter(writeStream))
+                    var TextoArchivo = Lectura.ReadToEnd();
+                    if (Opcion == "Descifrar" && ExtensionArchivo == ".cif")
                     {
-                        using (var Lectura = new StreamReader(ArchivoImportado.InputStream))
+                        ExtensionNuevoArchivo = ".txt";
+                        var TextoDescifrado = new SerieIModel().DecryptZZ(TextoArchivo, nivel);
+                        using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo), FileMode.OpenOrCreate))
                         {
-                            var TextoArchivo = Lectura.ReadToEnd();
-                            if (Opcion=="Descifrar" && ExtensionArchivo == ".cif")
+                            using (var writer = new StreamWriter(writeStream))
                             {
-                                ExtensionNuevoArchivo = ".txt";
-                                var TextoDescifrado = new SerieIModel().DecryptZZ(TextoArchivo, nivel);
                                 writer.Write(TextoDescifrado);
                             }
-                            if (Opcion == "Cifrar" && ExtensionArchivo == ".txt")
+                        }
+                    }
+                    if (Opcion == "Cifrar" && ExtensionArchivo == ".txt")
+                    {
+                        ExtensionNuevoArchivo = ".cif";
+                        var TextoCifrado = new SerieIModel().EncryptionZZ(TextoArchivo, nivel);
+                        using (var writeStream = new FileStream(Server.MapPath(@"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo), FileMode.OpenOrCreate))
+                        {
+                            using (var writer = new StreamWriter(writeStream))
                             {
-                                ExtensionNuevoArchivo = ".cif";
-                                var TextoCifrado = new SerieIModel().EncryptionZZ(TextoArchivo, nivel);
                                 writer.Write(TextoCifrado);
                             }
                         }
-                    }                    
+                    }
                 }
+                
             }
             var FileVirtualPath = @"~/App_Data/" + NombreArchivo + ExtensionNuevoArchivo;
             return File(FileVirtualPath, "application / force - download", Path.GetFileName(FileVirtualPath));
